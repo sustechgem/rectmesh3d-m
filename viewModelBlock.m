@@ -1,5 +1,5 @@
-% Visualize 3D model on a regular mesh. Can display cell values on inquiry
-% blocks or sections/slices
+% Visualize 3D model and/or mesh on a rectilinear mesh. Can display cell 
+%     values on inquiry blocks or sections/slices
 % FUNCTION hp = viewModel(nodeX,nodeY,nodeZ,model,logflag,block)
 % INPUT
 %     nodeX, nodeY, nodeZ: define a 3D mesh
@@ -16,9 +16,8 @@
 % OUTPUT
 %    hp: [Nblk x 1] Patch array for the handles of the patch objects
 %    created in the axis
+% LAST MODIFIED 20191107
 function hp = viewModelBlock(nodeX,nodeY,nodeZ,model,logflag,block)
-
-
 
 Nnx = length(nodeX);
 Nny = length(nodeY);
@@ -26,8 +25,6 @@ Nnz = length(nodeZ);
 Ncx = Nnx-1;
 Ncy = Nny-1;
 Ncz = Nnz-1;
-
-         
           
 if isempty(model)
     model = nan(Ncx*Ncy*Ncz,1);
