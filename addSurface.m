@@ -1,7 +1,7 @@
 % Add subsurface to model
 % FUNCTION model_out = addSurface(nodeX,nodeY,nodeZ,model_in,sfLocInfo,val_out)
 % INPUT
-%     nodeX,nodeY,nodeZ: mesh parameter
+%     nodeX,nodeY,nodeZ: mesh parameter nodeX ¡Ê[Xmin, Xmax]£¬nodeY ¡Ê[Ymin, Ymax]
 %     model_in: input model, to which new blocks are added, if omitted, assign
 %     0 everywhere in the mesh; can be a scalar
 %     sfLocInfo: surface location info, a matrix containing the coordinates
@@ -9,7 +9,7 @@
 %     val_out: model value under the surface (/layer)
 % OUTPUT
 %     model_out: model vector with objects embedded
-% LAST MODIFIED 20201230 yinchu.li@hotmail.com
+% LAST MODIFIED 20210316 yinchu.li@hotmail.com
 function model_out = addSurface(nodeX, nodeY, nodeZ, model_in, sfLocInfo, val_out)
 Nx = length(nodeX) - 1;
 Ny = length(nodeY) - 1;
@@ -32,8 +32,9 @@ zcenter = unique(z);
 
 [xq,yq] = meshgrid(xcenter, ycenter);
 zq = griddata(sfLocInfo(:, 1),sfLocInfo(:, 2),sfLocInfo(:,3),xq,yq);
+zq_t = zq';
 
-zLoc = repelem(zq(:), length(zcenter));
+zLoc = repelem(zq_t(:), length(zcenter));
 ind = z - zLoc <= 0;
 model_out(ind) = val_out;
 
