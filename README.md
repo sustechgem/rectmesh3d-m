@@ -21,6 +21,18 @@ edges connect **nodes**.
 #### addBlock
 - Add cuboidal blocks to an existing model.
 
+#### addCylinder
+- Add round cylinders to an existing model.
+
+#### addEllipsoid
+- Add an ellipsoid to an existing model.
+
+#### addSlab
+- Add a slab to an existing model.
+
+#### addSurface
+- Add an arbitrary surface to an existing model. 
+
 #### addDisk
 - Add round disks to an existing model.
 

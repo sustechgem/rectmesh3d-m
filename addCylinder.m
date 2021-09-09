@@ -1,16 +1,16 @@
-function model_out = addCylinder(nodeX, nodeY, nodeZ, model_in, cldLocInfo, cldValInfo)
 % Add round cylinders to model
 % FUNCTION model_out = addCylinder(nodeX,nodeY,nodeZ,model_in,cldLocInfo,cldValInfo)
 % INPUT
 %     nodeX,nodeY,nodeZ: mesh parameter
 %     model_in: input model vector, to which new blocks are added, if omitted, %     assign 0 everywhere in the mesh; can be a scalar
-%     cldLocInfo: cylinder location info, Ncld x 7 matrix, for each row 
+%     cldLocInfo: cylinder location info, Ncld x 7 matrix, for each row
 %     [endpoint_x1 end_point_y1 endpoint_z1 endpoint_x2 endpoint_y2 endpoint_z2 radius];
-%     endpoint(_x1, y1, z1, x2, y2, z2): end point coordinates of cylinderical axis
-%     dcldValInfo: cylinder's model value, Ncld x 1 vector, each element for one conductivity
+%     endpoint(x1, y1, z1, x2, y2, z2): end point coordinates of cylinderical axis
+%     dcldValInfo: cylinder's model value, Ncld x 1 vector, each element for one cylinder
 % OUTPUT
 %     model_out: model vector with objects embedded
 % LAST MODIFIED 20201201 ycli0536@gmail.com
+function model_out = addCylinder(nodeX, nodeY, nodeZ, model_in, cldLocInfo, cldValInfo)
 
 Nx = length(nodeX) - 1;
 Ny = length(nodeY) - 1;
@@ -45,24 +45,24 @@ for i = 1:Ncld
     y2 = cldLocInfo(i,5);
     z2 = cldLocInfo(i,6);
     radius = cldLocInfo(i,7);
-    
+
     cylinder_axis = [x2 - x1; y2 - y1; z2 - z1];
     direct = cylinder_axis / norm(cylinder_axis);
     f = R * [0; 0; 1] - direct;
     func = matlabFunction(f, 'Vars',{[a, b, c]});
     solution = fsolve(func, [0, 0, 0]);
-    
+
     alpha = solution(1);
     beta = solution(2);
     theta = solution(3);
     Len = sqrt((x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2);
     % displacement_vector: (mid point of the cylinder axis - Origin)
     displacement_vector = [(x1+x2)/2 (y1+y2)/2 (z1+z2)/2];
-    
+
     x0 = displacement_vector(1);
     y0 = displacement_vector(2);
     z0 = displacement_vector(3);
-    
+
     xt = - x0*cos(beta)*cos(theta)  + x*cos(beta)*cos(theta) ...
          + y0*cos(alpha)*sin(theta) - y*cos(alpha)*sin(theta) ...
          - z0*sin(alpha)*sin(theta) + z*sin(alpha)*sin(theta) ...
@@ -75,12 +75,12 @@ for i = 1:Ncld
          - y0*sin(alpha)*sin(beta)*sin(theta) + y*sin(alpha)*sin(beta)*sin(theta);
     zt = - x*sin(beta) + y*cos(beta)*sin(alpha) + z*cos(alpha)*cos(beta) ...
          + x0*sin(beta) - z0*cos(alpha)*cos(beta) - y0*cos(beta)*sin(alpha);
-    
+
     % Assumed standard cylinder expression: (x/a)^2 + (y/b)^2 = 1, where z
     % from [-Z, Z]
     dist = sqrt( (xt.^2)./radius^2 + (yt.^2)./radius^2);
     ind = (dist <= 1) & (zt >= -Len/2) & (zt <= Len/2);
-    
+
     model_out(ind) = cldValInfo(i);
 
 end
