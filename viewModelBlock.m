@@ -1,22 +1,22 @@
-% Visualize 3D model and/or mesh on a rectilinear mesh. Can display cell 
+% Visualize 3D model and/or mesh on a rectilinear mesh. Can display cell
 %     values on inquiry blocks or sections/slices
-% FUNCTION hp = viewModel(nodeX,nodeY,nodeZ,model,logflag,block)
+% FUNCTION hp = viewModelBlock(nodeX,nodeY,nodeZ,model,logflag,block)
 % INPUT
 %     nodeX, nodeY, nodeZ: define a 3D mesh
 %     model: a vector of model in UBC-GIF ordering; if empty, only load
 %         mesh; use NaN to mask the ignored value.
 %     logflag: empty or 'log', indicating the color map is in linear or logarithmic scale
-%     block: [Nblk x 6] numeric array, specify the boundaries of 
+%     block: [Nblk x 6] numeric array, specify the boundaries of
 %         blocks to be viewed; each row for a block and can have multiple
 %         blocks; within each row [xmin xmax ymin ymax zmax zmin]; use -inf
-%         or inf to indicate range of infinity; block boundaries in meter are 
+%         or inf to indicate range of infinity; block boundaries in meter are
 %         snapped to the nearest nodes; if max and min are snapped to the same
-%         node, use the mean of max and min relative to the node to determine which side of 
+%         node, use the mean of max and min relative to the node to determine which side of
 %         the face is taken for the cross section; empty means showing the entire.
 % OUTPUT
 %    hp: [Nblk x 1] Patch array for the handles of the patch objects
 %    created in the axis
-% LAST MODIFIED 20191107
+% LAST MODIFIED 20191107 yangdikun@gmail.com
 function hp = viewModelBlock(nodeX,nodeY,nodeZ,model,logflag,block)
 
 Nnx = length(nodeX);
@@ -25,7 +25,7 @@ Nnz = length(nodeZ);
 Ncx = Nnx-1;
 Ncy = Nny-1;
 Ncz = Nnz-1;
-          
+
 if isempty(model)
     model = nan(Ncx*Ncy*Ncz,1);
 end
@@ -51,7 +51,7 @@ Nblk = size(block,1);
 Wall = cell(Nblk,1);
 WallView = cell(Nblk,1);
 for p = 1:Nblk
-    
+
     % snap to nearest node and convert meter to node count
     [~, wNodeInd] = min(abs(nodeX-block(p,1)));
     [~, eNodeInd] = min(abs(nodeX-block(p,2)));
@@ -59,7 +59,7 @@ for p = 1:Nblk
     [~, nNodeInd] = min(abs(nodeY-block(p,4)));
     [~, tNodeInd] = min(abs(nodeZ-block(p,5)));
     [~, bNodeInd] = min(abs(nodeZ-block(p,6)));
-    
+
     % west and east wall
     [a, b, c]=meshgrid([wNodeInd eNodeInd],sNodeInd:nNodeInd-1,tNodeInd:bNodeInd-1);
     weWall = [a(:) b(:) c(:)];
@@ -70,7 +70,7 @@ for p = 1:Nblk
         weWallView(weWall(:,1)==wNodeInd) = 1;
         weWallView(weWall(:,1)==eNodeInd) = -1;
     end
-    
+
     % south and north wall
     [a, b, c]=meshgrid(wNodeInd:eNodeInd-1,[sNodeInd nNodeInd],tNodeInd:bNodeInd-1);
     snWall = [a(:) b(:) c(:)];
@@ -81,7 +81,7 @@ for p = 1:Nblk
         snWallView(snWall(:,2)==sNodeInd) = 2;
         snWallView(snWall(:,2)==nNodeInd) = -2;
     end
-    
+
     % top and bottom wall
     [a, b, c]=meshgrid(wNodeInd:eNodeInd-1,sNodeInd:nNodeInd-1,[tNodeInd bNodeInd]);
     tbWall = [a(:) b(:) c(:)];
@@ -92,11 +92,11 @@ for p = 1:Nblk
         tbWallView(tbWall(:,3)==tNodeInd) = -3;
         tbWallView(tbWall(:,3)==bNodeInd) = 3;
     end
-  
-    
+
+
     Wall{p} = [weWall; snWall; tbWall];
     WallView{p} = [weWallView; snWallView; tbWallView];
-    
+
 end
 
 
@@ -111,37 +111,37 @@ indIncreTable = [0 1 Nnz Nnz+1 Nnz*Nnx Nnz*Nnx+1 Nnz*Nnx+Nnz]';
 vertexRule = [1 2 6 5;   % face orient type 1, normal direction x
               1 2 4 3;   % face orient type 2, normal direction y
               1 3 7 5];   % face orient type 3, normal direction z
-          
-figure;          
+
+figure;
 for p = 1:Nblk
-    
+
     xyzind = Wall{p};
     orient = WallView{p};
-          
+
     Nface = size(xyzind,1);
     nodeInd = zeros(Nface,4);
-    
+
     % four vertices of face
     nodeInd(:,1) = Nnz*Nnx*(xyzind(:,2)-1) + Nnz*(xyzind(:,1)-1) + xyzind(:,3);
     nodeInd(:,2) = nodeInd(:,1) + indIncreTable(vertexRule(abs(orient),2));
     nodeInd(:,3) = nodeInd(:,1) + indIncreTable(vertexRule(abs(orient),3));
     nodeInd(:,4) = nodeInd(:,1) + indIncreTable(vertexRule(abs(orient),4));
-    
+
     % find cell index using the sign of orient
     countCellY = xyzind(:,2) - 1 - (orient==-2);
     countCellX = xyzind(:,1) - 1 - (orient==-1);
     countCellZ = xyzind(:,3)     - (orient== 3);
-    
+
     % safeguard beyond-boundary index
     countCellX(countCellX<0) = 0; countCellX(countCellX>Ncx-1) = Ncx-1;
     countCellY(countCellY<0) = 0; countCellY(countCellY>Ncy-1) = Ncy-1;
     countCellZ(countCellZ==0) = 1; countCellZ(countCellZ>Ncz) = Ncz;
-    
-    
-    
+
+
+
     cellInd = Ncx * Ncz * countCellY + Ncz * countCellX + countCellZ;
     cdata = model(cellInd);
-    
+
     hp(p) = patch('Faces',nodeInd,'Vertices',node,'FaceVertexCData',cdata,...
         'CDataMapping','scaled','FaceColor','flat');
 
