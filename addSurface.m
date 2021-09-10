@@ -1,7 +1,7 @@
 % Add subsurface to model
 % FUNCTION model_out = addSurface(nodeX,nodeY,nodeZ,model_in,sfLocInfo,val_out)
 % INPUT
-%     nodeX,nodeY,nodeZ: mesh parameter nodeX ¡Ê[Xmin, Xmax]£¬nodeY ¡Ê[Ymin, Ymax]
+%     nodeX,nodeY,nodeZ: mesh parameter
 %     model_in: input model, to which new blocks are added, if omitted, assign
 %     0 everywhere in the mesh; can be a scalar
 %     sfLocInfo: surface location info, Nsf cells, from top to bottom  
