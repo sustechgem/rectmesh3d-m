@@ -6,7 +6,7 @@
 %       center: center [x,y,z] of sphere
 %       radius_in, radius_out: inner and outer radii of sphere (upper and
 %       lower bounds of transition zone)
-%     sphereValInfo: sphere's value, Nblk x 2 vector, for each row [value_in,value_out]
+%     sphereValInfo: sphere's value, Nsphere x 2 vector, for each row [value_in,value_out]
 %       val_in, val_out: model values for the sphere (in) and the outmost 
 %       edge of transition zone (out); cells outside of radius_out will not be changed
 % OUTPUT
