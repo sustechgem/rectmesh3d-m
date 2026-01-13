@@ -9,9 +9,9 @@
 % LAST MODIFIED 20191107 yangdikun@gmail.com
 function [nodeX2, nodeY2, nodeZ2, model2] = cropModel(nodeX1,nodeY1,nodeZ1,model1,cropLoc)
 
-Nx = length(nodeX) - 1;
-Ny = length(nodeY) - 1;
-Nz = length(nodeZ) - 1;
+Nx = length(nodeX1) - 1;
+Ny = length(nodeY1) - 1;
+Nz = length(nodeZ1) - 1;
 
 xmin = cropLoc(1);
 if isinf(xmin)
