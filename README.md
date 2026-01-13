@@ -82,6 +82,9 @@ arbitrary points.
 #### node2size
 - Get cell sizes along x/y/z direction when nodes are given.
 
+#### PointTopo2MeshTopo
+- Convert topography represented by scattered points to topography model (0=air, 1=earth) in a 3D mesh.
+
 #### PointXYZ2CellIndex
 - Find the global indices of cells that encloses given points.
 
